@@ -81,5 +81,4 @@ public class LoginOauthService implements LoginOauthUseCase {
 
         return jsonWebTokenDto;
     }
-
 }
