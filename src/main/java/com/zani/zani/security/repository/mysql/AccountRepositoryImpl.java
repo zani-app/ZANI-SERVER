@@ -59,13 +59,6 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Account findBySerialIdOrProviderOrElseNull(String serialId, ESecurityProvider provider) {
-        return accountJpaRepository.findBySerialIdAndProvider(serialId, provider)
-                .map(AccountEntity::toAccount)
-                .orElse(null);
-    }
-
-    @Override
     public void existsBySerialIdAndProviderThenThrow(String serialId, ESecurityProvider provider) {
         accountJpaRepository.findBySerialIdAndProvider(serialId, provider)
                 .ifPresent(account -> {
