@@ -9,7 +9,9 @@ import com.zani.zani.security.application.usecase.AuthenticateOauthUseCase;
 import com.zani.zani.security.domain.type.ESecurityProvider;
 import com.zani.zani.security.info.GoogleOauth2UserInfo;
 import com.zani.zani.security.info.KakaoOauth2UserInfo;
+import com.zani.zani.security.info.TemporaryKakaoOauth2UserInfo;
 import com.zani.zani.security.info.factory.Oauth2UserInfo;
+import com.zani.zani.security.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,8 @@ public class AuthenticateOauthService implements AuthenticateOauthUseCase {
     @Value("${oauth.google.path}")
     private String googlePath;
 
+    private final AccountRepository accountRepository;
+
     private final RestClientUtil restClientUtil;
     private final ObjectMapper objectMapper;
 
@@ -46,7 +50,14 @@ public class AuthenticateOauthService implements AuthenticateOauthUseCase {
                     JSONObject jsonObject = restClientUtil.sendGetMethodWithAuthorizationHeader(
                             kakaoUrl + kakaoPath, requestDto.accessToken()
                     );
-                    return objectMapper.readValue(jsonObject.toString(), KakaoOauth2UserInfo.class);
+                    Oauth2UserInfo principal = objectMapper.readValue(jsonObject.toString(), KakaoOauth2UserInfo.class);
+
+                    if (accountRepository.findBySerialIdOrProviderOrElseNull(principal.getId(), KAKAO) == null) {
+                        return objectMapper.readValue(jsonObject.toString(), TemporaryKakaoOauth2UserInfo.class);
+                    } else {
+                        return principal;
+                    }
+
                 } catch (IOException e) {
                     throw new RuntimeException("Failed to authenticate with Kakao : {}", e);
                 }
@@ -56,7 +67,13 @@ public class AuthenticateOauthService implements AuthenticateOauthUseCase {
                     JSONObject jsonObject = restClientUtil.sendGetMethodWithAuthorizationHeader(
                             googleUrl + googlePath, requestDto.accessToken()
                     );
-                    return objectMapper.readValue(jsonObject.toString(), GoogleOauth2UserInfo.class);
+                    Oauth2UserInfo principal = objectMapper.readValue(jsonObject.toString(), GoogleOauth2UserInfo.class);
+
+                    if (accountRepository.findBySerialIdOrProviderOrElseNull(principal.getId(), ESecurityProvider.GOOGLE) == null) {
+                        return objectMapper.readValue(jsonObject.toString(), TemporaryKakaoOauth2UserInfo.class);
+                    } else {
+                        return principal;
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException("Failed to authenticate with Google : {}", e);
                 }
