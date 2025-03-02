@@ -27,6 +27,13 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
+    public Account findBySerialIdAndProviderOrElseNull(String serialId, ESecurityProvider provider) {
+        return accountJpaRepository.findBySerialIdAndProvider(serialId, provider)
+                .map(AccountEntity::toAccount)
+                .orElse(null);
+    }
+
+    @Override
     public void save(Account account) {
         AccountEntity entity;
         if (account instanceof User) {
@@ -56,13 +63,6 @@ public class AccountRepositoryImpl implements AccountRepository {
         return accountJpaRepository.findBySerialIdAndProvider(serialId, provider)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ACCOUNT))
                 .toAccount();
-    }
-
-    @Override
-    public Account findBySerialIdOrProviderOrElseNull(String serialId, ESecurityProvider provider) {
-        return accountJpaRepository.findBySerialIdAndProvider(serialId, provider)
-                .map(AccountEntity::toAccount)
-                .orElse(null);
     }
 
     @Override

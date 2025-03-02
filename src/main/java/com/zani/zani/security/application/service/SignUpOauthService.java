@@ -57,7 +57,6 @@ public class SignUpOauthService implements SignUpOauthUseCase {
                 .createdAt(LocalDateTime.now())
                 .nickname(requestDto.nickname())
                 .profileImgUrl(userDefaultImgUrl)
-                .nickname(requestDto.nickname())
                 .build();
 
         userRepository.save(user);
