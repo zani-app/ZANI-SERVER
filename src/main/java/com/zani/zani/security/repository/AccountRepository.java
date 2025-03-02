@@ -15,5 +15,7 @@ public interface AccountRepository {
 
     Account findBySerialIdAndProviderOrElseThrow(String serialId, ESecurityProvider provider);
 
+    Account findBySerialIdAndProviderOrElseNull(String serialId, ESecurityProvider provider);
+
     void existsBySerialIdAndProviderThenThrow(String serialId, ESecurityProvider provider);
 }

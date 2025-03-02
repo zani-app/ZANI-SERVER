@@ -52,7 +52,7 @@ public class AuthenticateOauthService implements AuthenticateOauthUseCase {
                     );
                     Oauth2UserInfo principal = objectMapper.readValue(jsonObject.toString(), KakaoOauth2UserInfo.class);
 
-                    if (accountRepository.findBySerialIdAndProviderOrElseThrow(principal.getId(), KAKAO) == null) {
+                    if (accountRepository.findBySerialIdAndProviderOrElseNull(principal.getId(), KAKAO) == null) {
                         return objectMapper.readValue(jsonObject.toString(), TemporaryKakaoOauth2UserInfo.class);
                     } else {
                         return principal;
@@ -69,7 +69,7 @@ public class AuthenticateOauthService implements AuthenticateOauthUseCase {
                     );
                     Oauth2UserInfo principal = objectMapper.readValue(jsonObject.toString(), GoogleOauth2UserInfo.class);
 
-                    if (accountRepository.findBySerialIdAndProviderOrElseThrow(principal.getId(), ESecurityProvider.GOOGLE) == null) {
+                    if (accountRepository.findBySerialIdAndProviderOrElseNull(principal.getId(), ESecurityProvider.GOOGLE) == null) {
                         return objectMapper.readValue(jsonObject.toString(), TemporaryKakaoOauth2UserInfo.class);
                     } else {
                         return principal;
