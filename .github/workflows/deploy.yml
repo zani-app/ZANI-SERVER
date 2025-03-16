@@ -1,0 +1,27 @@
+name: Deploy to EC2 using Docker
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/app
+            git pull origin $(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
+            docker-compose down
+            docker-compose up -d --build
